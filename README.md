@@ -1,6 +1,8 @@
 # oculus-mock-invensense
 
-Arduino
+> A Mock API For Oculus with Arduino and MPU6050
+
+Arduino + MPU6050 DMP
 
     quat	0.86	0.48	0.15	-0.01
     euler	9.77	-14.44	-59.88
