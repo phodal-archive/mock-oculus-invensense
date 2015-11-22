@@ -36,8 +36,12 @@ void dmpDataReady() {
 
 void setup() {
     // join I2C bus (I2Cdev library doesn't do this automatically)
+    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
         TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz). Comment this line if having compilation difficulties with TWBR.
+    #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+        Fastwire::setup(400, true);
+    #endif
         
     Serial.begin(115200);
     while (!Serial); // wait for Leonardo enumeration, others continue immediately
@@ -48,6 +52,7 @@ void setup() {
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu.dmpInitialize();
 
+    while (Serial.available() && Serial.read()); // empty buffer again
     // supply your own gyro offsets here, scaled for min sensitivity
     mpu.setXGyroOffset(220);
     mpu.setYGyroOffset(76);
@@ -126,11 +131,11 @@ void loop() {
         mpu.dmpGetQuaternion(&q, fifoBuffer);
         mpu.dmpGetEuler(euler, &q);
         Serial.print("euler\t");
-        Serial.print(euler[0] * 180/M_PI);
+        Serial.print(euler[0]);
         Serial.print("\t");
-        Serial.print(euler[1] * 180/M_PI);
+        Serial.print(euler[1]);
         Serial.print("\t");
-        Serial.println(euler[2] * 180/M_PI);
+        Serial.println(euler[2]);
 
         // blink LED to indicate activity
         blinkState = !blinkState;
