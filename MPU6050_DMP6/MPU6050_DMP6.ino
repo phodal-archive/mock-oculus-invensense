@@ -113,7 +113,7 @@ void loop() {
 
         // display quaternion values in easy matrix form: w x y z
         mpu.dmpGetQuaternion(&q, fifoBuffer);
-        Serial.print("{\"position\":{ \"w\":");
+        Serial.print("{\"quat\":{ \"w\":");
         Serial.print(q.w);
         Serial.print(", \"x\":");
         Serial.print(q.x);
@@ -122,11 +122,11 @@ void loop() {
         Serial.print(", \"z\":");
         Serial.print(q.z);
         Serial.print("}");
-
+ 
         // display Euler angles in degrees
         mpu.dmpGetQuaternion(&q, fifoBuffer);
         mpu.dmpGetEuler(euler, &q);
-        Serial.print(", \"quat\":{ \"x\":");
+        Serial.print(", \"position\":{ \"x\":");
         Serial.print(euler[0]);
         Serial.print(",\"y\":");
         Serial.print(euler[1]);
