@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/phodal/oculus-mock-invensense#readme",
   "dependencies": {
-    "serialport": "^2.0.5"
+    "express": "^4.13.3",
+    "serialport": "^2.0.5",
+    "ws": "^0.8.0"
   }
 }
