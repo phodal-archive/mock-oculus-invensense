@@ -125,13 +125,14 @@ void loop() {
  
         // display Euler angles in degrees
         mpu.dmpGetQuaternion(&q, fifoBuffer);
-        mpu.dmpGetEuler(euler, &q);
+        mpu.dmpGetGravity(&gravity, &q);
+        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
         Serial.print(", \"position\":{ \"x\":");
-        Serial.print(euler[0]);
+        Serial.print(ypr[0]);
         Serial.print(",\"y\":");
-        Serial.print(euler[1]);
+        Serial.print(ypr[1]);
         Serial.print(",\"z\":");
-        Serial.print(euler[2]);
+        Serial.print(ypr[2]);
         Serial.println("}}");
 
         // blink LED to indicate activity
