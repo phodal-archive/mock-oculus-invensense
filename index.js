@@ -63,6 +63,7 @@ serialPort.open(function (error) {
 
             ws.on("close", function () {
                 setTimeout(null, 500);
+                serialPort.close();
                 //clearInterval(orientation);
                 console.log("disconnect");
             });
