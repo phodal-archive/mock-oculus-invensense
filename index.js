@@ -24,39 +24,51 @@ wss.on('open', function open() {
     console.log('connected');
 });
 
+serialPort.open(function (error) {
+    if (error) {
+        console.log('failed to open: ' + error);
+    } else {
+
 // On socket connection set up event emitters to automatically push the HMD orientation data
-wss.on("connection", function (ws) {
-    serialPort.open(function (error) {
-        if (error) {
-            console.log('failed to open: ' + error);
-        } else {
-            function emitOrientation() {
-                id = id + 1;
+        wss.on("connection", function (ws) {
+            //function emitOrientation() {
 
-                serialPort.on('data', function (data) {
-                    console.log(data);
-                    ws.send(data);
-                });
-                serialPort.write("ls\n", function (err, results) {
-                    console.log('results ' + results);
-                });
-            }
+            //}
 
-            var orientation = setInterval(emitOrientation, 1000);
+            //var orientation = setInterval(emitOrientation, 1000);
 
             ws.on("message", function (data) {
-                clearInterval(orientation);
-                orientation = setInterval(emitOrientation, data);
+                //clearInterval(orientation);
+                //orientation = setInterval(emitOrientation, data);
+                serialPort.on('data', function (data) {
+                    id = id + 1;
+                    console.log(data);
+                    if (data.indexOf("position") > -1) {
+                        try {
+                            var originData = JSON.parse(data);
+                            originData.id = id;
+
+                            //setTimeout(function(){
+                                ws.send(JSON.stringify(originData), function (error) {
+                                    //it's a bug of websocket, see in https://github.com/websockets/ws/issues/337
+                                });
+                            //}, 200);
+                        } catch (e) {
+
+                        }
+                    }
+                });
             });
 
 
             ws.on("close", function () {
                 setTimeout(null, 500);
-                clearInterval(orientation);
+                //clearInterval(orientation);
                 console.log("disconnect");
             });
-        }
-    });
+
+        });
+    }
 });
 
 // Launch express server
