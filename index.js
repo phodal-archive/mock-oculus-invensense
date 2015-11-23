@@ -11,7 +11,7 @@ var app = express();
 app.set('port', process.env.PORT || 3000);
 
 
-var serialPort = new SerialPort("/dev/tty.usbmodem1411", {
+var serialPort = new SerialPort("/dev/tty.usbmodem1421", {
     parser: serialport.parsers.readline("\n"),
     baudrate: 115200
 }, false); // this is the openImmediately flag [default is true]
@@ -24,22 +24,11 @@ wss.on('open', function open() {
     console.log('connected');
 });
 
-serialPort.open(function (error) {
-    if (error) {
-        console.log('failed to open: ' + error);
-    } else {
-
 // On socket connection set up event emitters to automatically push the HMD orientation data
-        wss.on("connection", function (ws) {
-            //function emitOrientation() {
-
-            //}
-
-            //var orientation = setInterval(emitOrientation, 1000);
-
-            ws.on("message", function (data) {
-                //clearInterval(orientation);
-                //orientation = setInterval(emitOrientation, data);
+wss.on("connection", function (ws) {
+    function emitOrientation(cb) {
+        serialPort.open(function (error) {
+            if (!error) {
                 serialPort.on('data', function (data) {
                     id = id + 1;
                     console.log(data);
@@ -48,28 +37,31 @@ serialPort.open(function (error) {
                             var originData = JSON.parse(data);
                             originData.id = id;
 
-                            //setTimeout(function(){
-                                ws.send(JSON.stringify(originData), function (error) {
-                                    //it's a bug of websocket, see in https://github.com/websockets/ws/issues/337
-                                });
-                            //}, 200);
+                            cb(data);
                         } catch (e) {
 
                         }
                     }
                 });
-            });
-
-
-            ws.on("close", function () {
-                setTimeout(null, 500);
-                serialPort.close();
-                //clearInterval(orientation);
-                console.log("disconnect");
-            });
-
+            }
         });
     }
+
+    ws.on("message", function (data) {
+        emitOrientation(function (originData) {
+            ws.send(JSON.stringify(originData), function (error) {
+                console.log(error);
+            });
+        })
+    });
+
+
+    ws.on("close", function () {
+        setTimeout(null, 500);
+        serialPort.close();
+        //clearInterval(orientation);
+        console.log("disconnect");
+    });
 });
 
 // Launch express server
