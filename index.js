@@ -34,32 +34,35 @@ wss.on("connection", function (ws) {
                     console.log(data);
                     if (data.indexOf("position") > -1) {
                         try {
-                            var originData = JSON.parse(data);
-                            originData.id = id;
-
-                            cb(data);
+                            var data = JSON.parse(data);
+                            data.id = id;
                         } catch (e) {
 
                         }
                     }
+                    cb(data);
                 });
             }
         });
     }
 
+    var cb = function (originData) {
+        ws.send(JSON.stringify(originData), function (error) {
+            console.log(error);
+        });
+    };
+    var orientation = setInterval(emitOrientation(cb), 1000);
+
     ws.on("message", function (data) {
-        emitOrientation(function (originData) {
-            ws.send(JSON.stringify(originData), function (error) {
-                console.log(error);
-            });
-        })
+        clearInterval(orientation);
+        orientation = setInterval(emitOrientation(cb), 1000);
     });
 
 
     ws.on("close", function () {
         setTimeout(null, 500);
         serialPort.close();
-        //clearInterval(orientation);
+        clearInterval(orientation);
         console.log("disconnect");
     });
 });
