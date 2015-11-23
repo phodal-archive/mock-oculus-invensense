@@ -120,7 +120,7 @@ void loop() {
         Serial.print("\t");
         Serial.print(q.y);
         Serial.print("\t");
-        Serial.println(q.z);
+        Serial.print(q.z);
 
         // display Euler angles in degrees
         mpu.dmpGetQuaternion(&q, fifoBuffer);
