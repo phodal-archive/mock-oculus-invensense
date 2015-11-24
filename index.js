@@ -40,6 +40,7 @@ wss.on("connection", function (ws) {
 
                         }
                     }
+                    serialPort.on('close', cb);
                     cb(data);
                 });
             }
@@ -61,7 +62,6 @@ wss.on("connection", function (ws) {
 
     ws.on("close", function () {
         setTimeout(null, 500);
-        serialPort.close();
         clearInterval(orientation);
         console.log("disconnect");
     });
